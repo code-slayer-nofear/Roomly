@@ -61,6 +61,22 @@ export class ListingRepository {
   updateRating(listingId: Types.ObjectId, avgRating: number, reviewCount: number) {
     return Listing.findByIdAndUpdate(listingId, { avgRating, reviewCount });
   }
+
+  addPhotos(id: string, hostId: Types.ObjectId, urls: string[]) {
+    return Listing.findOneAndUpdate(
+      { _id: id, hostId },
+      { $push: { photos: { $each: urls } } },
+      { new: true }
+    );
+  }
+
+  removePhoto(id: string, hostId: Types.ObjectId, url: string) {
+    return Listing.findOneAndUpdate(
+      { _id: id, hostId },
+      { $pull: { photos: url } },
+      { new: true }
+    );
+  }
 }
 
 export default new ListingRepository();
