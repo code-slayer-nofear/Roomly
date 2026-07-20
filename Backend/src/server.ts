@@ -13,6 +13,7 @@ import listingRoutes from "./routes/listings";
 import bookingRoutes from "./routes/bookings";
 import reviewRoutes from "./routes/reviews";
 import messageRoutes from "./routes/messages";
+import webhookRoutes from "./routes/webhook";
 
 const app = express();
 const server = http.createServer(app);
@@ -22,6 +23,10 @@ const io = new Server(server, {
 
 app.set("io", io);
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+// Webhook must be mounted before express.json() — Stripe needs the raw body
+app.use("/api/webhooks", webhookRoutes);
+
 app.use(express.json());
 app.use(cookieParser());
 
