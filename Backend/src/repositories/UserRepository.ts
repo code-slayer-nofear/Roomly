@@ -25,6 +25,12 @@ export class UserRepository {
   removeFromWishlist(userId: Types.ObjectId, listingId: Types.ObjectId) {
     return User.findByIdAndUpdate(userId, { $pull: { wishlists: listingId } }, { new: true });
   }
+
+  getWishlist(userId: Types.ObjectId) {
+    return User.findById(userId)
+      .select("wishlists")
+      .populate("wishlists", "title photos location pricePerNight avgRating reviewCount status");
+  }
 }
 
 export default new UserRepository();
