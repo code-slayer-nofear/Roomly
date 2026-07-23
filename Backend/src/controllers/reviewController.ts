@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import reviewRepository from "../repositories/ReviewRepository";
 import bookingRepository from "../repositories/BookingRepository";
 import listingRepository from "../repositories/ListingRepository";
+import { notify } from "../services/notificationService";
 import { AuthRequest } from "../types";
 
 export const createReview = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -32,6 +33,14 @@ export const createReview = async (req: AuthRequest, res: Response, next: NextFu
 
     const { avg, count } = await reviewRepository.getAverageRating(booking.listingId);
     await listingRepository.updateRating(booking.listingId, parseFloat(avg.toFixed(1)), count);
+
+    // Notify the review target
+    void notify({
+      userId:  review.targetId,
+      type:    "review_received",
+      payload: { reviewId: review._id, listingId: booking.listingId, rating },
+      io:      req.app.get("io"),
+    });
 
     res.status(201).json(review);
   } catch (err) { next(err); }

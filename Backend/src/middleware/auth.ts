@@ -14,6 +14,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     const decoded = verifyToken(authHeader.split(" ")[1]);
     const user = await userRepository.findById(decoded.id);
     if (!user) { res.status(401).json({ message: "User not found" }); return; }
+    if (user.isSuspended) { res.status(403).json({ message: "Account suspended" }); return; }
     req.user = user;
     next();
   } catch (err) {
@@ -25,6 +26,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         const decoded = verifyRefreshToken(refreshToken);
         const user = await userRepository.findById(decoded.id);
         if (!user) { res.status(401).json({ message: "User not found" }); return; }
+        if (user.isSuspended) { res.status(403).json({ message: "Account suspended" }); return; }
         const newToken = signToken(user._id);
         res.setHeader("X-New-Token", newToken);
         req.user = user;

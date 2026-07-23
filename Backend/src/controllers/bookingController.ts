@@ -2,7 +2,10 @@ import { Response, NextFunction } from "express";
 import bookingRepository from "../repositories/BookingRepository";
 import listingRepository from "../repositories/ListingRepository";
 import paymentRepository from "../repositories/PaymentRepository";
+import userRepository from "../repositories/UserRepository";
 import { createPaymentIntent, refundPaymentIntent } from "../config/stripe";
+import { notify } from "../services/notificationService";
+import { sendBookingRequestedEmail, sendBookingCancelledEmail } from "../services/emailService";
 import { AuthRequest } from "../types";
 
 const GUEST_FEE_RATE = 0.12;
@@ -40,6 +43,29 @@ export const createBooking = async (req: AuthRequest, res: Response, next: NextF
       priceBreakdown: { subtotal, guestServiceFee, hostServiceFee, cleaningFee: 0, taxes: 0, total },
     });
 
+    // Notify host of new booking request
+    void notify({
+      userId:  listing.hostId,
+      type:    "booking_requested",
+      payload: { bookingId: booking._id, listingId, guestId: req.user!._id },
+      io:      req.app.get("io"),
+    });
+
+    // Email host about the new booking request
+    const host = listing.hostId as any;
+    if (host?.email) {
+      sendBookingRequestedEmail({
+        hostEmail:    host.email,
+        hostName:     host.name,
+        guestName:    req.user!.name,
+        listingTitle: listing.title,
+        checkIn:      checkInDate.toDateString(),
+        checkOut:     checkOutDate.toDateString(),
+        nights,
+        total,
+      });
+    }
+
     res.status(201).json(booking);
   } catch (err) { next(err); }
 };
@@ -52,9 +78,11 @@ export const initiatePayment = async (req: AuthRequest, res: Response, next: Nex
     if (!booking.guestId.equals(req.user!._id)) { res.status(403).json({ message: "Forbidden" }); return; }
     if (booking.paymentStatus === "paid") { res.status(400).json({ message: "Booking already paid" }); return; }
 
+    const listing = await listingRepository.findById(booking.listingId.toString());
+    const currency = listing?.currency ?? "USD";
     const amountInCents = Math.round(booking.priceBreakdown.total * 100);
 
-    const intent = await createPaymentIntent(amountInCents, booking.priceBreakdown ? "usd" : "usd", {
+    const intent = await createPaymentIntent(amountInCents, currency, {
       bookingId: booking._id.toString(),
       guestId:   booking.guestId.toString(),
       hostId:    booking.hostId.toString(),
@@ -82,6 +110,18 @@ export const getMyBookings = async (req: AuthRequest, res: Response, next: NextF
   try {
     const bookings = await bookingRepository.findByGuest(req.user!._id);
     res.json(bookings);
+  } catch (err) { next(err); }
+};
+
+export const getBooking = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const booking = await bookingRepository.findById(req.params.id);
+    if (!booking) { res.status(404).json({ message: "Booking not found" }); return; }
+    const isGuest = booking.guestId.equals(req.user!._id);
+    const isHost  = booking.hostId.equals(req.user!._id);
+    const isAdmin = req.user!.role.includes("admin");
+    if (!isGuest && !isHost && !isAdmin) { res.status(403).json({ message: "Forbidden" }); return; }
+    res.json(booking);
   } catch (err) { next(err); }
 };
 
@@ -119,6 +159,30 @@ export const cancelBooking = async (req: AuthRequest, res: Response, next: NextF
     booking.status      = "cancelled";
     booking.cancelledBy = isGuest ? "guest" : "host";
     await bookingRepository.save(booking);
+
+    // Notify the other party about the cancellation
+    const notifyUserId = isGuest ? booking.hostId : booking.guestId;
+    void notify({
+      userId:  notifyUserId,
+      type:    "booking_cancelled",
+      payload: { bookingId: booking._id, cancelledBy: booking.cancelledBy },
+      io:      req.app.get("io"),
+    });
+
+    // Email the other party about the cancellation
+    const otherUser = await userRepository.findById(notifyUserId);
+    if (otherUser?.email) {
+      sendBookingCancelledEmail({
+        email:        otherUser.email,
+        name:         otherUser.name,
+        listingTitle: booking.listingId.toString(),
+        checkIn:      booking.checkIn.toDateString(),
+        checkOut:     booking.checkOut.toDateString(),
+        refunded:     booking.paymentStatus === "refunded",
+        total:        booking.priceBreakdown.total,
+      });
+    }
+
     res.json(booking);
   } catch (err) { next(err); }
 };

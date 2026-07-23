@@ -31,8 +31,20 @@ export class BookingRepository {
     return Booking.findById(id);
   }
 
+  findByPaymentIntent(paymentIntentId: string) {
+    return Booking.findOne({ paymentIntentId });
+  }
+
   save(booking: IBookingDocument) {
     return booking.save();
+  }
+
+  // Marks all confirmed bookings whose checkOut has passed as completed
+  completeExpired() {
+    return Booking.updateMany(
+      { status: "confirmed", checkOut: { $lte: new Date() } },
+      { status: "completed" }
+    );
   }
 
   getAnalytics() {

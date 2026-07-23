@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import crypto from "crypto";
 import mongoose, { Types } from "mongoose";
 import messageRepository from "../repositories/MessageRepository";
+import { notify } from "../services/notificationService";
 import { AuthRequest } from "../types";
 
 const getConversationId = (userId1: Types.ObjectId, userId2: string, listingId: string): Types.ObjectId => {
@@ -22,6 +23,14 @@ export const sendMessage = async (req: AuthRequest, res: Response, next: NextFun
       text,
     });
     req.app.get("io")?.to(receiverId).emit("new_message", message);
+
+    void notify({
+      userId:  new Types.ObjectId(receiverId),
+      type:    "new_message",
+      payload: { messageId: message._id, senderId: req.user!._id, listingId },
+      io:      req.app.get("io"),
+    });
+
     res.status(201).json(message);
   } catch (err) { next(err); }
 };

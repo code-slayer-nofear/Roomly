@@ -1,5 +1,13 @@
 import { Types } from "mongoose";
 import { Request } from "express";
+import { IUserDocument } from "../models/User";
+
+// Tell Passport (and Express) that req.user is always our IUserDocument
+declare global {
+  namespace Express {
+    interface User extends IUserDocument {}
+  }
+}
 
 export interface IUser {
   _id: Types.ObjectId;
@@ -129,5 +137,5 @@ export interface INotification {
 }
 
 export interface AuthRequest extends Request {
-  user?: IUser;
+  user?: IUserDocument;
 }

@@ -14,6 +14,14 @@ export class UserRepository {
     return User.create(data);
   }
 
+  findOrCreateOAuth(data: { email: string; name: string; avatarUrl?: string; authProvider: string }) {
+    return User.findOneAndUpdate(
+      { email: data.email },
+      { $setOnInsert: { ...data, isVerified: true } },
+      { upsert: true, new: true }
+    ).select("-passwordHash");
+  }
+
   findByIdAndUpdate(id: string | Types.ObjectId, update: Partial<IUserDocument>) {
     return User.findByIdAndUpdate(id, update, { new: true }).select("-passwordHash");
   }
