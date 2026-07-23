@@ -15,6 +15,9 @@ export default function BookingDetailPage() {
     return <div className="text-center py-32 text-gray-400">Booking not found.</div>;
   }
 
+  const guestCount = typeof booking.guests === "number" ? booking.guests : (booking.guests?.adults ?? 0) + (booking.guests?.children ?? 0) + (booking.guests?.infants ?? 0);
+  const totalPrice = booking.totalPrice ?? booking.priceBreakdown?.total ?? 0;
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -42,11 +45,11 @@ export default function BookingDetailPage() {
           </div>
           <div className="rounded-xl border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-400">Guests</p>
-            <p className="mt-1 font-semibold text-gray-900">{booking.guests}</p>
+            <p className="mt-1 font-semibold text-gray-900">{guestCount}</p>
           </div>
           <div className="rounded-xl border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-400">Total</p>
-            <p className="mt-1 font-semibold text-gray-900">{formatCurrency(booking.totalPrice, booking.listing?.currency ?? "USD")}</p>
+            <p className="mt-1 font-semibold text-gray-900">{formatCurrency(totalPrice, booking.listing?.currency ?? "USD")}</p>
           </div>
         </div>
 

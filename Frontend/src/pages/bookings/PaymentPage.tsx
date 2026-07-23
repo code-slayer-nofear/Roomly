@@ -10,6 +10,7 @@ export default function PaymentPage() {
   const { id } = useParams<{ id: string }>();
   const { data: booking, isLoading } = useBooking(id!);
   const [clientSecret, setClientSecret] = useState("");
+  const totalPrice = booking?.totalPrice ?? booking?.priceBreakdown?.total ?? 0;
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => api.post(`/bookings/${id}/pay`),
@@ -39,7 +40,7 @@ export default function PaymentPage() {
         <div className="mt-6 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">
           <div className="flex items-center justify-between gap-3">
             <span>Total amount</span>
-            <span className="font-semibold text-gray-900">{formatCurrency(booking.totalPrice, booking.listing?.currency ?? "USD")}</span>
+            <span className="font-semibold text-gray-900">{formatCurrency(totalPrice, booking.listing?.currency ?? "USD")}</span>
           </div>
         </div>
 

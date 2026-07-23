@@ -30,39 +30,44 @@ export default function MyBookingsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {bookings.map((booking) => (
-            <div key={booking._id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-lg font-semibold text-gray-900">{booking.listing?.title ?? "Listing"}</p>
-                  <p className="text-sm text-gray-500">
-                    {booking.listing?.location?.city ?? "Unknown city"} · {formatDate(booking.checkIn)} to {formatDate(booking.checkOut)}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {booking.guests} guest{booking.guests > 1 ? "s" : ""} · {booking.paymentStatus}
-                  </p>
+          {bookings.map((booking) => {
+            const guestCount = typeof booking.guests === "number" ? booking.guests : (booking.guests?.adults ?? 0) + (booking.guests?.children ?? 0) + (booking.guests?.infants ?? 0);
+            const totalPrice = booking.totalPrice ?? booking.priceBreakdown?.total ?? 0;
+
+            return (
+              <div key={booking._id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">{booking.listing?.title ?? "Listing"}</p>
+                    <p className="text-sm text-gray-500">
+                      {booking.listing?.location?.city ?? "Unknown city"} · {formatDate(booking.checkIn)} to {formatDate(booking.checkOut)}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {guestCount} guest{guestCount > 1 ? "s" : ""} · {booking.paymentStatus}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusStyles[booking.status] ?? "bg-gray-100 text-gray-700"}`}>
+                      {booking.status}
+                    </span>
+                    <span className="text-base font-semibold text-gray-900">
+                      {formatCurrency(totalPrice, booking.listing?.currency ?? "USD")}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusStyles[booking.status] ?? "bg-gray-100 text-gray-700"}`}>
-                    {booking.status}
-                  </span>
-                  <span className="text-base font-semibold text-gray-900">
-                    {formatCurrency(booking.totalPrice ?? 0, booking.listing?.currency ?? "USD")}
-                  </span>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link to={`/bookings/${booking._id}`} className="text-sm font-medium text-rose-500 hover:underline">
+                    View booking
+                  </Link>
+                  <Link to={`/bookings/${booking._id}/pay`} className="text-sm font-medium text-slate-700 hover:underline">
+                    Payment test page
+                  </Link>
                 </div>
               </div>
-
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link to={`/bookings/${booking._id}`} className="text-sm font-medium text-rose-500 hover:underline">
-                  View booking
-                </Link>
-                <Link to={`/bookings/${booking._id}/pay`} className="text-sm font-medium text-slate-700 hover:underline">
-                  Payment test page
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

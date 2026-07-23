@@ -30,8 +30,16 @@ export default function ListingDetailPage() {
   const total = nights > 0 && listing ? nights * listing.pricePerNight : 0;
 
   const { mutate: createBooking, isPending } = useMutation({
-    mutationFn: () =>
-      api.post("/bookings", { listing: id, checkIn, checkOut, guests }),
+    mutationFn: () => api.post("/bookings", {
+      listingId: id,
+      checkIn: new Date(`${checkIn}T12:00:00`).toISOString(),
+      checkOut: new Date(`${checkOut}T12:00:00`).toISOString(),
+      guests: {
+        adults: Math.max(1, guests),
+        children: 0,
+        infants: 0,
+      },
+    }),
     onSuccess: ({ data }) => navigate(`/bookings/${data._id}/pay`),
     onError: (err) => {
       const msg = (err as AxiosError<ApiError>)?.response?.data?.message ?? "Booking failed";

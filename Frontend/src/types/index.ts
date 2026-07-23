@@ -54,13 +54,15 @@ export interface Listing {
 
 export interface Booking {
   _id: string;
-  listing: Listing;
-  guest: User;
-  host: User;
+  listing?: Listing;
+  listingId?: string | { _id?: string; title?: string; currency?: string; location?: { city?: string; country?: string } };
+  guest?: User;
+  host?: User;
   checkIn: string;
   checkOut: string;
-  guests: number;
-  totalPrice: number;
+  guests: number | { adults?: number; children?: number; infants?: number };
+  totalPrice?: number;
+  priceBreakdown?: { total?: number };
   status: "pending" | "confirmed" | "cancelled" | "completed";
   paymentStatus: "unpaid" | "paid" | "refunded";
   createdAt: string;
@@ -69,7 +71,8 @@ export interface Booking {
 export interface Review {
   _id: string;
   listing: string;
-  author: User;
+  author?: User;
+  authorId?: { _id?: string; id?: string; name?: string; avatarUrl?: string };
   rating: number;
   comment: string;
   createdAt: string;
