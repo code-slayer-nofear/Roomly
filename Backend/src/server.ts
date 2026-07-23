@@ -15,6 +15,7 @@ import reviewRoutes from "./routes/reviews";
 import messageRoutes from "./routes/messages";
 import webhookRoutes from "./routes/webhook";
 import userRoutes from "./routes/users";
+import adminRoutes from "./routes/admin";
 
 const app = express();
 const server = http.createServer(app);
@@ -39,6 +40,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users",    userRoutes);
+app.use("/api/admin",   adminRoutes);
 
 app.use(errorHandler);
 

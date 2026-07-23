@@ -16,6 +16,7 @@ const userSchema = new Schema<IUserDocument>(
     phone: String,
     role: { type: [String], default: ["guest"] },
     isVerified: { type: Boolean, default: false },
+    isSuspended: { type: Boolean, default: false },
     bio: String,
     address: { country: String, city: String },
     wishlists: [{ type: Schema.Types.ObjectId, ref: "Listing" }],

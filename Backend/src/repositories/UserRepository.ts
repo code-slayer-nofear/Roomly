@@ -31,6 +31,18 @@ export class UserRepository {
       .select("wishlists")
       .populate("wishlists", "title photos location pricePerNight avgRating reviewCount status");
   }
+
+  findAll(page: number, limit: number) {
+    return User.find()
+      .select("-passwordHash")
+      .sort("-createdAt")
+      .skip((page - 1) * limit)
+      .limit(limit);
+  }
+
+  setSuspended(id: string, isSuspended: boolean) {
+    return User.findByIdAndUpdate(id, { isSuspended }, { new: true }).select("-passwordHash");
+  }
 }
 
 export default new UserRepository();

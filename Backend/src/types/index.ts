@@ -11,6 +11,7 @@ export interface IUser {
   phone?: string;
   role: string[];
   isVerified: boolean;
+  isSuspended: boolean;
   bio?: string;
   address?: { country?: string; city?: string };
   wishlists: Types.ObjectId[];

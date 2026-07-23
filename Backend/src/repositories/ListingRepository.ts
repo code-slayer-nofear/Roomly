@@ -77,6 +77,18 @@ export class ListingRepository {
       { new: true }
     );
   }
+
+  findAll(page: number, limit: number) {
+    return Listing.find()
+      .select("-availability")
+      .sort("-createdAt")
+      .skip((page - 1) * limit)
+      .limit(limit);
+  }
+
+  setStatus(id: string, status: "published" | "suspended" | "draft") {
+    return Listing.findByIdAndUpdate(id, { status }, { new: true });
+  }
 }
 
 export default new ListingRepository();

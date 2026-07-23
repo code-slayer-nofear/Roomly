@@ -34,6 +34,31 @@ export class BookingRepository {
   save(booking: IBookingDocument) {
     return booking.save();
   }
+
+  getAnalytics() {
+    return Promise.all([
+      // Total GMV — sum of all paid booking totals
+      Booking.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, gmv: { $sum: "$priceBreakdown.total" } } },
+      ]),
+      // Bookings per day for the last 30 days
+      Booking.aggregate([
+        { $match: { createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+      ]),
+      Booking.countDocuments(),
+      Booking.countDocuments({ status: "confirmed" }),
+      Booking.countDocuments({ status: "cancelled" }),
+    ]).then(([gmvResult, bookingsPerDay, total, confirmed, cancelled]) => ({
+      gmv: gmvResult[0]?.gmv ?? 0,
+      bookingsPerDay,
+      total,
+      confirmed,
+      cancelled,
+    }));
+  }
 }
 
 export default new BookingRepository();
