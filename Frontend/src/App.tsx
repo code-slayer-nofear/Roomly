@@ -1,11 +1,68 @@
 import { Routes, Route } from "react-router-dom";
-import { Layout } from "./components/layout";
+import { Layout, ProtectedRoute, RoleRoute, GuestRoute } from "./components/layout";
+import { useMe } from "./hooks/useMe";
+
+// Auth
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import OAuthCallbackPage from "./pages/auth/OAuthCallbackPage";
+
+// Public
+import HomePage from "./pages/misc/HomePage";
+import SearchPage from "./pages/listings/SearchPage";
+import ListingDetailPage from "./pages/listings/ListingDetailPage";
+import PublicProfilePage from "./pages/profile/PublicProfilePage";
 
 function App() {
+  // Validate session + hydrate user on app load
+  useMe();
+
   return (
     <Routes>
+      {/* OAuth callback — outside layout */}
+      <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+
+      {/* Guest-only routes (redirect to / if already logged in) */}
+      <Route element={<GuestRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+      </Route>
+
+      {/* Public routes */}
       <Route element={<Layout />}>
-        <Route path="/" element={<div className="p-8 text-2xl font-bold">Roomly 🏠</div>} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/listings" element={<SearchPage />} />
+        <Route path="/listings/:id" element={<ListingDetailPage />} />
+        <Route path="/users/:id" element={<PublicProfilePage />} />
+      </Route>
+
+      {/* Protected routes (auth required) */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          {/* Step 6: BookingDetailPage, PaymentPage */}
+          {/* Step 7: GuestTripsPage, WishlistPage */}
+          {/* Step 8: InboxPage, ConversationPage */}
+          {/* Step 9: NotificationsPage */}
+          {/* Step 10: ReviewFormPage */}
+          {/* Step 12: EditProfilePage */}
+        </Route>
+      </Route>
+
+      {/* Host routes */}
+      <Route element={<RoleRoute role="host" />}>
+        <Route element={<Layout />}>
+          {/* Step 11: HostDashboardPage, HostBookingsPage, CreateListingPage, EditListingPage */}
+        </Route>
+      </Route>
+
+      {/* Admin routes */}
+      <Route element={<RoleRoute role="admin" />}>
+        <Route element={<Layout />}>
+          {/* Step 13: AdminUsersPage, AdminListingsPage, AdminAnalyticsPage */}
+        </Route>
       </Route>
     </Routes>
   );
