@@ -6,7 +6,7 @@ export function useListing(id: string) {
   return useQuery<Listing>({
     queryKey: ["listing", id],
     queryFn: async () => {
-      const { data } = await api.get(`/api/listings/${id}`);
+      const { data } = await api.get(`/listings/${id}`);
       return data;
     },
     enabled: !!id,

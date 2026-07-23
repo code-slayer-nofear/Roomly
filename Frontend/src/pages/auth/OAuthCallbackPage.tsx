@@ -14,7 +14,7 @@ export default function OAuthCallbackPage() {
     const token = params.get("token");
     if (!token) { navigate("/login", { replace: true }); return; }
 
-    api.get<User>("/api/users/me", {
+    api.get<User>("/users/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(({ data }) => {

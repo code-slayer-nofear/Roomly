@@ -26,7 +26,7 @@ export default function RegisterPage() {
   });
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: (data: FormData) => api.post("/api/auth/register", data),
+    mutationFn: (data: FormData) => api.post("/auth/register", data),
     onSuccess: ({ data }) => {
       setAuth(data.token, data.user);
       navigate("/", { replace: true });

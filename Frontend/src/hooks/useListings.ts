@@ -21,8 +21,15 @@ export function useListings(filters: Partial<SearchFilters> & { page?: number } 
           else params.set(k, String(v));
         }
       });
-      const { data } = await api.get(`/api/listings?${params.toString()}`);
-      return data;
+
+      const { data } = await api.get(`/listings?${params.toString()}`);
+
+      return {
+        listings: Array.isArray(data) ? data : data?.listings ?? [],
+        total: Array.isArray(data) ? data.length : data?.total ?? (data?.listings?.length ?? 0),
+        page: Array.isArray(data) ? 1 : data?.page ?? 1,
+        pages: Array.isArray(data) ? 1 : data?.pages ?? 1,
+      };
     },
     staleTime: 2 * 60 * 1000,
   });

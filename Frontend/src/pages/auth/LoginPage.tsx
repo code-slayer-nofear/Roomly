@@ -27,7 +27,7 @@ export default function LoginPage() {
   });
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: (data: FormData) => api.post("/api/auth/login", data),
+    mutationFn: (data: FormData) => api.post("/auth/login", data),
     onSuccess: ({ data }) => {
       setAuth(data.token, data.user);
       navigate(from, { replace: true });

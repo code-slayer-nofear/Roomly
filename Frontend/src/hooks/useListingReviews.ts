@@ -6,7 +6,7 @@ export function useListingReviews(listingId: string) {
   return useQuery<Review[]>({
     queryKey: ["reviews", listingId],
     queryFn: async () => {
-      const { data } = await api.get(`/api/reviews/listing/${listingId}`);
+      const { data } = await api.get(`/reviews/listing/${listingId}`);
       return data;
     },
     enabled: !!listingId,

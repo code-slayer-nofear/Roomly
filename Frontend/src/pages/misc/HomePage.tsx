@@ -11,6 +11,7 @@ export default function HomePage() {
   const [city, setCity] = useState("");
 
   const { data, isLoading } = useListings({ page: 1 });
+  const listings = data?.listings ?? [];
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -63,14 +64,14 @@ export default function HomePage() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {data?.listings.map((listing) => (
+              {listings.map((listing) => (
                 <ListingCard key={listing._id} listing={listing} />
               ))}
             </div>
-            {data?.listings.length === 0 && (
+            {listings.length === 0 && (
               <p className="text-center text-gray-400 py-20">No listings available yet.</p>
             )}
-            {(data?.listings.length ?? 0) > 0 && (
+            {listings.length > 0 && (
               <div className="text-center mt-10">
                 <Button variant="outline" onClick={() => navigate("/search")}>
                   View all listings

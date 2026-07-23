@@ -31,7 +31,7 @@ export default function ListingDetailPage() {
 
   const { mutate: createBooking, isPending } = useMutation({
     mutationFn: () =>
-      api.post("/api/bookings", { listing: id, checkIn, checkOut, guests }),
+      api.post("/bookings", { listing: id, checkIn, checkOut, guests }),
     onSuccess: ({ data }) => navigate(`/bookings/${data._id}/pay`),
     onError: (err) => {
       const msg = (err as AxiosError<ApiError>)?.response?.data?.message ?? "Booking failed";

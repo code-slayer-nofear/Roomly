@@ -9,7 +9,7 @@ export function useMe() {
   return useQuery<User>({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await api.get("/api/users/me");
+      const { data } = await api.get("/users/me");
       setUser(data);
       return data;
     },

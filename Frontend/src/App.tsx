@@ -12,6 +12,9 @@ import HomePage from "./pages/misc/HomePage";
 import SearchPage from "./pages/listings/SearchPage";
 import ListingDetailPage from "./pages/listings/ListingDetailPage";
 import PublicProfilePage from "./pages/profile/PublicProfilePage";
+import MyBookingsPage from "./pages/bookings/MyBookingsPage";
+import BookingDetailPage from "./pages/bookings/BookingDetailPage";
+import PaymentPage from "./pages/bookings/PaymentPage";
 
 function App() {
   // Validate session + hydrate user on app load
@@ -42,12 +45,9 @@ function App() {
       {/* Protected routes (auth required) */}
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          {/* Step 6: BookingDetailPage, PaymentPage */}
-          {/* Step 7: GuestTripsPage, WishlistPage */}
-          {/* Step 8: InboxPage, ConversationPage */}
-          {/* Step 9: NotificationsPage */}
-          {/* Step 10: ReviewFormPage */}
-          {/* Step 12: EditProfilePage */}
+          <Route path="/bookings" element={<MyBookingsPage />} />
+          <Route path="/bookings/:id" element={<BookingDetailPage />} />
+          <Route path="/bookings/:id/pay" element={<PaymentPage />} />
         </Route>
       </Route>
 

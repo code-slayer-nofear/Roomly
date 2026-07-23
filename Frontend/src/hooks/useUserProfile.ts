@@ -6,7 +6,7 @@ export function useUserProfile(id: string) {
   return useQuery<User>({
     queryKey: ["user", id],
     queryFn: async () => {
-      const { data } = await api.get(`/api/users/${id}`);
+      const { data } = await api.get(`/users/${id}`);
       return data;
     },
     enabled: !!id,
