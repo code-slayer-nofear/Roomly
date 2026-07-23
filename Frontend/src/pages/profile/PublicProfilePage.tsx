@@ -9,8 +9,15 @@ export default function PublicProfilePage() {
   const { data: user, isLoading } = useUserProfile(id!);
   const { data: listingsData } = useListings({ page: 1 });
 
-  // Filter listings by this host client-side (backend doesn't expose host filter yet)
-  const hostListings = listingsData?.listings.filter((l) => l.host.id === id) ?? [];
+  const hostListings = listingsData?.listings.filter((listing) => {
+    const hostId = listing.host?.id ?? listing.hostId;
+    if (typeof hostId === "string") return hostId === id;
+    if (typeof hostId === "object" && hostId !== null) {
+      const objectHostId = "_id" in hostId ? hostId._id : hostId.id;
+      return objectHostId === id;
+    }
+    return false;
+  }) ?? [];
 
   if (isLoading) return <div className="flex justify-center py-32"><Spinner size="lg" /></div>;
   if (!user) return <div className="text-center py-32 text-gray-400">User not found.</div>;

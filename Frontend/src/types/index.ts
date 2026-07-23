@@ -6,7 +6,22 @@ export interface User {
   avatarUrl?: string;
   bio?: string;
   phone?: string;
+  address?: {
+    city?: string;
+    country?: string;
+  };
   isSuspended?: boolean;
+}
+
+export interface HostLike {
+  _id?: string;
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string[];
+  avatarUrl?: string;
+  bio?: string;
+  createdAt?: string;
 }
 
 export interface Listing {
@@ -29,10 +44,11 @@ export interface Listing {
   bathrooms: number;
   amenities: string[];
   photos: string[];
-  host: User;
+  host?: User;
+  hostId?: string | HostLike;
   avgRating?: number;
   reviewCount?: number;
-  status: "active" | "suspended" | "pending";
+  status: "active" | "published" | "suspended" | "pending" | "draft";
   cancellationPolicy: "flexible" | "moderate" | "strict";
 }
 

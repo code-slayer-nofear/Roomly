@@ -10,6 +10,34 @@ interface ListingsResponse {
   pages: number;
 }
 
+function normalizeListing(data: any): Listing {
+  const hostId = data?.hostId ?? data?.host;
+  const host = data?.host ?? (
+    typeof hostId === "string"
+      ? {
+          id: hostId,
+          name: "Host",
+          email: "",
+          role: ["host"],
+        }
+      : hostId && typeof hostId === "object"
+        ? {
+            id: hostId._id ?? hostId.id ?? "",
+            name: hostId.name ?? "Host",
+            email: hostId.email ?? "",
+            role: hostId.role ?? ["host"],
+            avatarUrl: hostId.avatarUrl,
+            bio: hostId.bio,
+          }
+        : undefined
+  );
+
+  return {
+    ...data,
+    host,
+  };
+}
+
 export function useListings(filters: Partial<SearchFilters> & { page?: number } = {}) {
   return useQuery<ListingsResponse>({
     queryKey: ["listings", filters],
@@ -23,10 +51,11 @@ export function useListings(filters: Partial<SearchFilters> & { page?: number } 
       });
 
       const { data } = await api.get(`/listings?${params.toString()}`);
+      const rawListings = Array.isArray(data) ? data : data?.listings ?? [];
 
       return {
-        listings: Array.isArray(data) ? data : data?.listings ?? [],
-        total: Array.isArray(data) ? data.length : data?.total ?? (data?.listings?.length ?? 0),
+        listings: rawListings.map(normalizeListing),
+        total: Array.isArray(data) ? data.length : data?.total ?? rawListings.length,
         page: Array.isArray(data) ? 1 : data?.page ?? 1,
         pages: Array.isArray(data) ? 1 : data?.pages ?? 1,
       };

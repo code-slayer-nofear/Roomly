@@ -49,6 +49,27 @@ export default function ListingDetailPage() {
   if (isLoading) return <div className="flex justify-center py-32"><Spinner size="lg" /></div>;
   if (!listing) return <div className="text-center py-32 text-gray-400">Listing not found.</div>;
 
+  const hostIdValue = listing.hostId;
+  const host = listing.host ?? (
+    typeof hostIdValue === "string"
+      ? {
+          id: hostIdValue,
+          name: "Host",
+          email: "",
+          role: ["host"],
+        }
+      : typeof hostIdValue === "object" && hostIdValue !== null
+        ? {
+            id: "_id" in hostIdValue ? hostIdValue._id ?? hostIdValue.id ?? "" : hostIdValue.id ?? "",
+            name: hostIdValue.name ?? "Host",
+            email: hostIdValue.email ?? "",
+            role: hostIdValue.role ?? ["host"],
+            avatarUrl: hostIdValue.avatarUrl,
+            bio: hostIdValue.bio,
+          }
+        : undefined
+  );
+
   const cancellationColors = { flexible: "success", moderate: "warning", strict: "danger" } as const;
 
   return (
@@ -116,15 +137,19 @@ export default function ListingDetailPage() {
           {/* Host */}
           <div className="pb-8 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Hosted by</h2>
-            <Link to={`/users/${listing.host.id}`} className="flex items-center gap-4 group">
-              <Avatar src={listing.host.avatarUrl} name={listing.host.name} size="lg" />
-              <div>
-                <p className="font-semibold text-gray-900 group-hover:text-rose-500 transition-colors">
-                  {listing.host.name}
-                </p>
-                <p className="text-sm text-gray-500">View profile</p>
-              </div>
-            </Link>
+            {host ? (
+              <Link to={`/users/${host.id}`} className="flex items-center gap-4 group">
+                <Avatar src={host.avatarUrl} name={host.name} size="lg" />
+                <div>
+                  <p className="font-semibold text-gray-900 group-hover:text-rose-500 transition-colors">
+                    {host.name}
+                  </p>
+                  <p className="text-sm text-gray-500">View profile</p>
+                </div>
+              </Link>
+            ) : (
+              <p className="text-sm text-gray-400">Host information unavailable.</p>
+            )}
           </div>
 
           {/* Reviews */}

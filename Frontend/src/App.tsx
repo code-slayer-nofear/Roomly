@@ -12,9 +12,16 @@ import HomePage from "./pages/misc/HomePage";
 import SearchPage from "./pages/listings/SearchPage";
 import ListingDetailPage from "./pages/listings/ListingDetailPage";
 import PublicProfilePage from "./pages/profile/PublicProfilePage";
+import ProfilePage from "./pages/profile/ProfilePage";
+import EditProfilePage from "./pages/profile/EditProfilePage";
 import MyBookingsPage from "./pages/bookings/MyBookingsPage";
 import BookingDetailPage from "./pages/bookings/BookingDetailPage";
 import PaymentPage from "./pages/bookings/PaymentPage";
+import WishlistPage from "./pages/wishlist/WishlistPage";
+import InboxPage from "./pages/messages/InboxPage";
+import ConversationPage from "./pages/messages/ConversationPage";
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+import NotFoundPage from "./pages/misc/NotFoundPage";
 
 function App() {
   // Validate session + hydrate user on app load
@@ -48,7 +55,17 @@ function App() {
           <Route path="/bookings" element={<MyBookingsPage />} />
           <Route path="/bookings/:id" element={<BookingDetailPage />} />
           <Route path="/bookings/:id/pay" element={<PaymentPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/inbox" element={<InboxPage />} />
+          <Route path="/inbox/:otherUserId/:listingId" element={<ConversationPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
         </Route>
+      </Route>
+
+      <Route element={<Layout />}>
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
 
       {/* Host routes */}

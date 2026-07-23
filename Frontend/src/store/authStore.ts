@@ -1,14 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import socket from "../lib/socket";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string[];
-  avatarUrl?: string;
-}
+import type { User } from "../types";
 
 interface AuthState {
   token: string | null;
