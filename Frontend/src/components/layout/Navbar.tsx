@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import socket from "../../lib/socket";
 import { useAuthStore } from "../../store/authStore";
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 import { Avatar } from "../ui";
 
 function NotificationBell({ count }: { count: number }) {
@@ -21,6 +24,9 @@ function NotificationBell({ count }: { count: number }) {
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
+  const queryClient = useQueryClient();
+  const { data } = useUnreadCount();
+  const unreadCount = data?.count ?? 0;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -35,6 +41,17 @@ export default function Navbar() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const handleNotification = () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
+    };
+    socket.on("notification", handleNotification);
+    return () => {
+      socket.off("notification", handleNotification);
+    };
+  }, [user, queryClient]);
 
   function handleLogout() {
     logout();
@@ -74,7 +91,7 @@ export default function Navbar() {
         <div className="flex items-center gap-1">
           {user ? (
             <>
-              <NotificationBell count={0} />
+              <NotificationBell count={unreadCount} />
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen((o) => !o)}

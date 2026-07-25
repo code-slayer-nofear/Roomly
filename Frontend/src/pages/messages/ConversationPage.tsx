@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../lib/api";
 import { Avatar, Button, Spinner } from "../../components/ui";
 import { formatDate } from "../../utils";
@@ -19,11 +19,13 @@ export default function ConversationPage() {
     enabled: !!otherUserId && !!listingId,
   });
 
+  const queryClient = useQueryClient();
+
   const { mutate: sendMessage, isPending } = useMutation({
-    mutationFn: () => api.post("/messages", { recipient: otherUserId, listingId, content: text }),
+    mutationFn: () => api.post("/messages", { receiverId: otherUserId, listingId, text }),
     onSuccess: () => {
       setText("");
-      window.location.reload();
+      queryClient.invalidateQueries({ queryKey: ["conversation", otherUserId, listingId] });
     },
   });
 

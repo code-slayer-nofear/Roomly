@@ -57,6 +57,11 @@ export default function BookingDetailPage() {
           <Link to={`/bookings/${booking._id}/pay`} className="rounded-lg bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-600">
             Open payment test page
           </Link>
+          {booking.status === "completed" && (
+            <Link to={`/bookings/${booking._id}/review`} className="rounded-lg border border-rose-500 text-rose-500 px-4 py-2 text-sm font-semibold hover:bg-rose-50">
+              Leave a review
+            </Link>
+          )}
           <Link to="/bookings" className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
             Back to my bookings
           </Link>

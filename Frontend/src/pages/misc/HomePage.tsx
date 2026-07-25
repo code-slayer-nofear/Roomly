@@ -39,7 +39,7 @@ export default function HomePage() {
             <Input
               placeholder="Where are you going?"
               value={city}
-              onChange={(e) => setCity(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCity(e.target.value)}
               className="flex-1 border-0 focus:ring-0 text-gray-800 placeholder-gray-400"
               leftIcon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

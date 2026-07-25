@@ -71,7 +71,7 @@ export default function SearchPage() {
               <Input
                 placeholder="City"
                 value={searchFilters.city}
-                onChange={(e) => setSearchFilters({ city: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({ city: e.target.value })}
                 className="flex-1"
               />
               <Button type="submit" size="sm">Go</Button>
@@ -86,14 +86,14 @@ export default function SearchPage() {
                   type="number"
                   min={0}
                   value={searchFilters.minPrice}
-                  onChange={(e) => { setSearchFilters({ minPrice: e.target.value }); setPage(1); }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearchFilters({ minPrice: e.target.value }); setPage(1); }}
                 />
                 <Input
                   placeholder="Max"
                   type="number"
                   min={0}
                   value={searchFilters.maxPrice}
-                  onChange={(e) => { setSearchFilters({ maxPrice: e.target.value }); setPage(1); }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearchFilters({ maxPrice: e.target.value }); setPage(1); }}
                 />
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function SearchPage() {
                 type="number"
                 min={1}
                 value={searchFilters.guests}
-                onChange={(e) => { setSearchFilters({ guests: Number(e.target.value) }); setPage(1); }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearchFilters({ guests: Number(e.target.value) }); setPage(1); }}
               />
             </div>
 

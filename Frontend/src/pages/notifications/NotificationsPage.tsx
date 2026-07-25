@@ -17,12 +17,18 @@ export default function NotificationsPage() {
 
   const { mutate: markAllRead, isPending } = useMutation({
     mutationFn: () => api.patch("/notifications/read-all"),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
+    },
   });
 
   const { mutate: markOneRead } = useMutation({
     mutationFn: (id: string) => api.patch(`/notifications/${id}/read`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
+    },
   });
 
   if (isLoading) {
